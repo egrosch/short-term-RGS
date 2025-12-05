@@ -9,5 +9,5 @@ breeding scheme looking for greater selection gain while preserving diversity. W
 different strategies on real oat and wheat datasets and compared genetic gain and genetic
 diversity with the applied truncation selection strategy using random mating.
 
-The necessary simulations were performed in RStudio using the SelectionTools software.
+The necessary simulations were performed in RStudio using the SelectionTools software.  
 The scripts for all strategies used are located in the strategies folder, and the files required for the data sets are located in the datasets folder.
