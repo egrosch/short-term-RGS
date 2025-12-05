@@ -1,6 +1,7 @@
 File c003-050_function_ExGrO.R contains a function for strategy ExGrO.
 Files starting with c003-5 belong to the wheat dataset while those starting with c003-6 belong to the oat dataset.
 Files ending with 00.R calculate marker effects for the respective dataset
+
 The remaining files contain the R-code for the following strategies:
 ~10.R	strategy “RND”
 ~11.R	strategy “CB80-L”
