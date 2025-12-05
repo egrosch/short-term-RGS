@@ -3,9 +3,9 @@ Files starting with c003-5 belong to the wheat dataset while those starting with
 Files ending with 00.R calculate marker effects for the respective dataset
 
 The remaining files contain the R-code for the following strategies:
-~10.R	strategy “RND”
-~11.R	strategy “CB80-L”
-~12.R	strategy “MAX-L”
+-10.R	strategy “RND”
+-11.R	strategy “CB80-L”
+-12.R	strategy “MAX-L”
 ~13.R	strategy “GDI-L”
 ~14.R	strategy “best”
 ~15.R	strategy “MAXGimmer”
