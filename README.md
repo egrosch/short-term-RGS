@@ -1,5 +1,6 @@
 # short-term-RGS
-Github repository for the paper "Selection strategies for short term recurrent genomic selection programs" by Grosch et al (2026). 
+Github repository for the paper "Combining different selection criteria into breeding strategies for short-term recurrent
+genomic selection" by Grosch et al (2026). 
 
 Avelbility of genetic markers allowed the use of recurrent genomic selection in plant breeding.
 However, first applications showed a higher genetic short-term gain while diversity and long-term
