@@ -1,6 +1,6 @@
 ################################################################################
 # RGS: oat dataset
-# Strategy SM-UC-2
+# Strategy MAXG2-TOP/UC1-SM
 ################################################################################
 
 sel.crs <- function (d.sorted,ncp,nct,old.crs=NULL)
@@ -146,17 +146,11 @@ dir.create(st.output.dir)
 st.set.info.level (-2)
 gs.set.num.threads(2)
 
-dbfile <- "data/c003_676.sqldb" # database
-
-NREP <- 300 # replications for the simulation
 NRUN <- 200  # how many sets of crosses are evaluated
 
 ################################################################################
 # Oat
 
-crop <- "oat"
-strategy <- "SM-UC-2"
-rfile <- "resultsoat" # file for the results in the database
 eff.file <- "data/c001-yld-oat.eff"
 map <- "oat.map"
 
@@ -190,16 +184,8 @@ population.sort("PA", decreasing=TRUE)
 population.divide("Psel", "PA", 144)
 
 ###########################################
-# Loop for the simulation
+# simulation
 ###########################################
-
-e    <- NULL
-
-st.set.info.level(-2)
-
-for (REP in 1:NREP) {
-
-cat (sprintf("%05i\r",REP))
 
 # Cross selected parental lines                        # CR-IL: MAX
 
@@ -371,14 +357,4 @@ for (i in 1:length(eval))
 }
 m <- tapply(d$y,d$gen,mean);
 e <- merge(data.frame(gen=names(m),y=m),v)
-rownames(e) <- c()
-e$Strategy <- strategy
-e$Crop <- crop
-e$Date <- date()
-
-# Save simulation results in data base
-conn <- dbConnect(RSQLite::SQLite(), dbfile)
-dbWriteTable(conn, rfile, e, append=TRUE)
-dbDisconnect(conn)
-
-} # for (REP in 1:NREP)
+e

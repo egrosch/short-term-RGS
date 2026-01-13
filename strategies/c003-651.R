@@ -1,23 +1,28 @@
 ################################################################################
 # RGS: oat dataset
-# Strategy GEGV-CB80
+# Strategy EXGRO
 ################################################################################
+
+#read in function 
+source("c003-050_function_ExGrO.R")
 
 library ("SelectionTools")
 library("sqldf")
+library("rrBLUP")
 
 ################################################################################
 
 st.input.dir  <- "input"
-st.output.dir <- "output611"
+st.output.dir <- "output651"
 dir.create(st.output.dir)
-st.set.info.level (-2)
-gs.set.num.threads(1)
+gs.set.num.threads(2)
 
 ################################################################################
 # Oat
 
 eff.file <- "data/c001-yld-oat.eff"
+mabstand<-read.table("input/oat.map",header = T)#für map
+colnames(mabstand) <- c("Name", "Chrom", "Pos")
 
 st.read.marker.data ("oat.mpo",format="m",data.set="PP") 
 st.read.map         ("oat.map",skip=1, format="mcp",data.set="PP")
@@ -29,6 +34,9 @@ st.restrict.marker.data (MaMis.MAX = 0.1, data.set = "PP")
 st.restrict.marker.data (ExHet.MIN = 0.1, data.set = "PP")
 st.restrict.marker.data (InMis.MAX= 0.1, data.set = "PP")
 
+gs.esteff.rr("BLUP",data.set="PP") 
+yld.eff <- gs.return.effects(data.set="PP")
+
 st.set.simpop ( pop.name="PP", data.set="PP" ) 
 load.effmap("yld", eff.file)
 
@@ -37,19 +45,19 @@ load.effmap("yld", eff.file)
 genotype.population("PP")
 evaluate.population("PP", "yld")
 
-# Select the best 144 P lines / GEGV
+# Select the best parental lines                        # SE-IL: GEV
 
 copy.population("PA","PP")
 genotype.population("PA")
 evaluate.population("PA", "yld")
 population.sort("PA", decreasing=TRUE) 
-population.divide("Psel", "PA", 144)                # SE-L: GEGV
+population.divide("Psel", "PA", 144)
 
 ###########################################
 # simulation
 ###########################################
 
-# mating of the selected P 
+## Random intermating of the selected P 
 
 population.copy("tmp","Psel")
 for (ii in 1:144) {
@@ -57,20 +65,18 @@ for (ii in 1:144) {
   population.divide (nme,"tmp",1)
 }
 
-idx <- 1:144                                         # CR-L: CB80
+idx <- sample(1:144,144)
 
-for (ii in 1:72) {                                
+for (ii in 1:72) {                                # CR-L: Random
   nme1 <- sprintf("p%03i",idx[ii])
   nme2 <- sprintf("p%03i",idx[72+ii])
   nme3 <- sprintf("f1%02i",ii)
   cross(nme3,nme1,nme2,1)
 }
 
-idx <- sample(1:72,72)
-
-for (ii in 1:36) {                                  # CR-1: Random
-  nme1 <- sprintf("f1%02i",idx[ii]) 
-  nme2 <- sprintf("f1%02i",idx[36+ii])
+for (ii in 1:36) {                                # CR-1: Random
+  nme1 <- sprintf("f1%02i",ii)
+  nme2 <- sprintf("f1%02i",36+ii)
   nme3 <- sprintf("SYN1%02i",ii)
   cross(nme3,nme1,nme2,10)
 }
@@ -81,53 +87,74 @@ for (ii in 1:36) {
   append.population("SYN1",nme3)
 }
 
-# Select the best 72 SYN1 plants / GEGV
-
 copy.population("SYN","SYN1")
 
-for (C in 2:3 ) {
+C <- 2; {
 
-genotype.population("SYN")                 # Starts with a population SYN
-evaluate.population("SYN", "yld")
-population.sort("SYN", decreasing=TRUE)    
-population.divide("SYNsel", "SYN", 72)     # SE-1 / SE-2: GEGV
+    st.get.simpop("SYN","SYN")
+    gs.set.effects(eff=yld.eff,data.set="SYN")  # CR-C2: ExpBVSelGrOff
+    crs <- ExpBVSelGrOff("SYN",72,mabstand,eff.file)
+    
+    population.copy("tmp","SYN")
+    for (ii in 1:360) {
+        nme <- sprintf("sy2%03i",ii)
+        population.divide (nme,"tmp",1)
+    }
+    
+    for (ii in 1:36) {                
+        nme1 <- sprintf("sy2%03i",crs[ii,1])
+        nme2 <- sprintf("sy2%03i",crs[ii,2])
+        nme3 <- sprintf("SYN2%02i",ii)   
+        cross(nme3,nme1,nme2,10)         
+    }
+    
+    remove.population("SYN2")
+    for (ii in 1:36) {
+        nme3 <- sprintf("SYN2%02i",ii)
+        append.population("SYN2",nme3)
+    }
 
-nme <- sprintf("SYN%1isel",C-1)
-copy.population(nme,"SYNsel")
+    copy.population("SYN","SYN2")
+    
+} # C=2
 
-population.copy("split","SYNsel")
-for (ii in 1:72) {
-  nme <- sprintf("s%03i",ii)
-  population.divide (nme,"split",1)
-}
+C <- 3; {
 
-idx <- sample(1:72,72)                     # CR-2 / CR-3: Random
-                                           
-for (ii in 1:36) {
-  nme1 <- sprintf("s%03i",idx[ii])
-  nme2 <- sprintf("s%03i",idx[36+ii])
-  nme3 <- sprintf("SYNn%02i",ii)
-  cross(nme3,nme1,nme2,10)                 
-}
+    st.get.simpop("SYN","SYN")
+    gs.set.effects(eff=yld.eff,data.set="SYN")
+    crs <- ExpBVSelGrOff("SYN",72,mabstand,eff.file) # CR-C3: ExpBVSelGrOff
+    
+    population.copy("tmp","SYN")
+    for (ii in 1:360) {
+        nme <- sprintf("sy3%03i",ii)
+        population.divide (nme,"tmp",1)
+    }
+    
+    for (ii in 1:36) {                
+        nme1 <- sprintf("sy3%03i",crs[ii,1])
+        nme2 <- sprintf("sy3%03i",crs[ii,2])
+        nme3 <- sprintf("SYN3%02i",ii)   
+        cross(nme3,nme1,nme2,10)         
+    }
+    
+    remove.population("SYN3")
+    for (ii in 1:36) {
+        nme3 <- sprintf("SYN3%02i",ii)
+        append.population("SYN3",nme3)
+    }
+    
+    copy.population("SYN","SYN3")
 
-remove.population("SYN")
-for (ii in 1:36) {
-  nme3 <- sprintf("SYNn%02i",ii)
-  append.population("SYN",nme3)
-}
+} # C=3
 
-nme <- sprintf("SYN%1i",C)
-copy.population (nme,"SYN")                # Generates the new SYN population
-
-} # for (C in 2:3 )
 
 # Select 36 SYN3 plants
 
 genotype.population("SYN")                 
 evaluate.population("SYN", "yld")
-population.sort("SYN", decreasing=TRUE)    
+population.sort("SYN", decreasing=TRUE)   # SE-3: GEGV 
 population.divide("SYNsel", "SYN", 36)     
-copy.population("SYN3sel","SYNsel")       # SE-3
+copy.population("SYN3sel","SYNsel")
 
 # 6 DH Lines per selected SYN3 plant
 

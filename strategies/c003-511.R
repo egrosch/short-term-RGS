@@ -1,5 +1,5 @@
 ################################################################################
-# RGS: oat dataset
+# RGS: wheat dataset
 # Strategy GEGV-CB80
 ################################################################################
 
@@ -9,21 +9,21 @@ library("sqldf")
 ################################################################################
 
 st.input.dir  <- "input"
-st.output.dir <- "output611"
+st.output.dir <- "output511"
 dir.create(st.output.dir)
 st.set.info.level (-2)
 gs.set.num.threads(1)
 
 ################################################################################
-# Oat
+# Wheat
 
-eff.file <- "data/c001-yld-oat.eff"
+eff.file <- "data/c001-yld-wheat.eff"
 
-st.read.marker.data ("oat.mpo",format="m",data.set="PP") 
-st.read.map         ("oat.map",skip=1, format="mcp",data.set="PP")
-st.read.performance.data ("oat.dta",data.set="PP")
+st.read.marker.data ("wheat.mpo",format="m",data.set="PP")
+st.read.map         ("wheat.map",skip=1, format="mcp",data.set="PP")
+st.read.performance.data ("wheat.dta",data.set="PP")
 
-#Markerdaten aufbereiten für Vergleichbarkeit der Diversität
+#processing data
 st.restrict.marker.data (NoAll.MAX = 2, data.set = "PP")
 st.restrict.marker.data (MaMis.MAX = 0.1, data.set = "PP")
 st.restrict.marker.data (ExHet.MIN = 0.1, data.set = "PP")
@@ -135,7 +135,7 @@ remove.population("DH")
 population.copy("split","SYNsel")
 for (ii in 1:36) {
     population.divide ("ss","split",1)
-    ssd.mating ("dd","ss",6, 5)
+    dh ("dd","ss",6)
     append.population("DH","dd")
 }
 

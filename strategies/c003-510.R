@@ -1,6 +1,6 @@
 ################################################################################
-# RGS: oat dataset
-# Strategy GEGV-CB80
+# RGS: wheat dataset
+# Strategy GEGV-RND
 ################################################################################
 
 library ("SelectionTools")
@@ -9,21 +9,21 @@ library("sqldf")
 ################################################################################
 
 st.input.dir  <- "input"
-st.output.dir <- "output611"
+st.output.dir <- "output510"
 dir.create(st.output.dir)
 st.set.info.level (-2)
 gs.set.num.threads(1)
 
 ################################################################################
-# Oat
+# Wheat
 
-eff.file <- "data/c001-yld-oat.eff"
+eff.file <- "data/c001-yld-wheat.eff"
 
-st.read.marker.data ("oat.mpo",format="m",data.set="PP") 
-st.read.map         ("oat.map",skip=1, format="mcp",data.set="PP")
-st.read.performance.data ("oat.dta",data.set="PP")
+st.read.marker.data ("wheat.mpo",format="m",data.set="PP")
+st.read.map         ("wheat.map",skip=1, format="mcp",data.set="PP")
+st.read.performance.data ("wheat.dta",data.set="PP")
 
-#Markerdaten aufbereiten für Vergleichbarkeit der Diversität
+#processing data
 st.restrict.marker.data (NoAll.MAX = 2, data.set = "PP")
 st.restrict.marker.data (MaMis.MAX = 0.1, data.set = "PP")
 st.restrict.marker.data (ExHet.MIN = 0.1, data.set = "PP")
@@ -49,7 +49,7 @@ population.divide("Psel", "PA", 144)                # SE-L: GEGV
 # simulation
 ###########################################
 
-# mating of the selected P 
+## Random intermating of the selected P 
 
 population.copy("tmp","Psel")
 for (ii in 1:144) {
@@ -57,20 +57,18 @@ for (ii in 1:144) {
   population.divide (nme,"tmp",1)
 }
 
-idx <- 1:144                                         # CR-L: CB80
+idx <- sample(1:144,144)
 
-for (ii in 1:72) {                                
+for (ii in 1:72) {                                # CR-L: Random
   nme1 <- sprintf("p%03i",idx[ii])
   nme2 <- sprintf("p%03i",idx[72+ii])
   nme3 <- sprintf("f1%02i",ii)
   cross(nme3,nme1,nme2,1)
 }
 
-idx <- sample(1:72,72)
-
-for (ii in 1:36) {                                  # CR-1: Random
-  nme1 <- sprintf("f1%02i",idx[ii]) 
-  nme2 <- sprintf("f1%02i",idx[36+ii])
+for (ii in 1:36) {                                # CR-1: Random
+  nme1 <- sprintf("f1%02i",ii)
+  nme2 <- sprintf("f1%02i",36+ii)
   nme3 <- sprintf("SYN1%02i",ii)
   cross(nme3,nme1,nme2,10)
 }
@@ -101,13 +99,13 @@ for (ii in 1:72) {
   population.divide (nme,"split",1)
 }
 
-idx <- sample(1:72,72)                     # CR-2 / CR-3: Random
+idx <- sample(1:72,72)                     
                                            
 for (ii in 1:36) {
   nme1 <- sprintf("s%03i",idx[ii])
   nme2 <- sprintf("s%03i",idx[36+ii])
   nme3 <- sprintf("SYNn%02i",ii)
-  cross(nme3,nme1,nme2,10)                 
+  cross(nme3,nme1,nme2,10)                 # CR-2 / CR-3: Random
 }
 
 remove.population("SYN")
@@ -135,7 +133,7 @@ remove.population("DH")
 population.copy("split","SYNsel")
 for (ii in 1:36) {
     population.divide ("ss","split",1)
-    ssd.mating ("dd","ss",6, 5)
+    dh ("dd","ss",6)
     append.population("DH","dd")
 }
 
@@ -169,3 +167,5 @@ for (i in 1:length(eval))
 m <- tapply(d$y,d$gen,mean);
 e <- merge(data.frame(gen=names(m),y=m),v)
 e
+
+

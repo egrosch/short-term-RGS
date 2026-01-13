@@ -1,6 +1,6 @@
 ################################################################################
 # RGS: wheat dataset
-# Strategy EMBV
+# Strategy EMGV-RND
 ################################################################################
 
 calc.embv <- function(pop,N,G,REP){
@@ -36,16 +36,9 @@ dir.create(st.output.dir)
 st.set.info.level (-2)
 gs.set.num.threads(2)
 
-dbfile <- "data/c003_528.sqldb" # database
-
-NREP <- 300 # replications for the simulation
-
 ################################################################################
 # Wheat
 
-crop <- "wheat"
-strategy <- "EMBV"
-rfile <- "resultswheat" # file for the results in the database
 eff.file <- "data/c001-yld-wheat.eff"
 
 st.read.marker.data ("wheat.mpo",format="m",data.set="PP")
@@ -64,7 +57,6 @@ yld.eff <- gs.return.effects(data.set="PP")
 st.set.simpop ( pop.name="PP", data.set="PP" ) 
 load.effmap("yld", eff.file)
 
-
 ################################################################################
 genotype.population("PP")
 evaluate.population("PP", "yld")
@@ -78,14 +70,9 @@ population.sort("PA", decreasing=TRUE)
 population.divide("Psel", "PA", 144)
 
 ###########################################
-# Loop for the simulation
+# simulation
 ###########################################
 
-e    <- NULL
-
-for (REP in 1:NREP) {
-
-cat (sprintf("%05i\r",REP))
 # Random intermating of the selected P 
 
 population.copy("tmp","Psel")
@@ -213,14 +200,4 @@ for (i in 1:length(eval))
 }
 m <- tapply(d$y,d$gen,mean);
 e <- merge(data.frame(gen=names(m),y=m),v)
-rownames(e) <- c()
-e$Strategy <- strategy
-e$Crop <- crop
-e$Date <- date()
-
-# Save simulation results in data base
-conn <- dbConnect(RSQLite::SQLite(), dbfile)
-dbWriteTable(conn, rfile, e, append=TRUE)
-dbDisconnect(conn)
-
-} # for (REP in 1:NREP)
+e

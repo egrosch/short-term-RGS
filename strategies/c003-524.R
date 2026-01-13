@@ -1,6 +1,6 @@
 ################################################################################
 # RGS: wheat dataset
-# Strategy MSD-2
+# Strategy MAXG2/UC2-TOP
 ################################################################################
 
 sel.crs <- function (d.sorted,ncp,nct,old.crs=NULL)
@@ -47,16 +47,9 @@ dir.create(st.output.dir)
 st.set.info.level (-2)
 gs.set.num.threads(2)
 
-dbfile <- "data/c003_524.sqldb" # database
-
-NREP <- 300
-
 ################################################################################
 # Wheat
 
-crop <- "wheat"
-strategy <- "MSD-2"
-rfile <- "resultswheat" # file for the results in the database
 eff.file <- "data/c001-yld-wheat.eff"
 
 st.read.marker.data ("wheat.mpo",format="m",data.set="PP")
@@ -90,16 +83,8 @@ population.sort("PA", decreasing=TRUE)
 population.divide("Psel", "PA", 144)
 
 ###########################################
-# Loop for simulations
+# simulation
 ###########################################
-
-e    <- NULL
-
-st.set.info.level(-2)
-
-for (REP in 1:NREP) {
-
-cat (sprintf("%05i\r",REP))
 
 # Cross selected partental lines                        # CR-IL: MAX
 
@@ -276,14 +261,4 @@ for (i in 1:length(eval))
 }
 m <- tapply(d$y,d$gen,mean);
 e <- merge(data.frame(gen=names(m),y=m),v)
-rownames(e) <- c()
-e$Strategy <- strategy
-e$Crop <- crop
-e$Date <- date()
-
-# Save simulation results in data base
-conn <- dbConnect(RSQLite::SQLite(), dbfile)
-dbWriteTable(conn, rfile, e, append=TRUE)
-dbDisconnect(conn)
-
-} # for (REP in 1:NREP)
+e

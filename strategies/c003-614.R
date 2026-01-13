@@ -1,6 +1,6 @@
 ################################################################################
 # RGS: oat dataset
-# Strategy best
+# Strategy GEGV-BEST
 ################################################################################
 
 library ("SelectionTools")
@@ -14,23 +14,9 @@ dir.create(st.output.dir)
 st.set.info.level (-2)
 gs.set.num.threads(2)
 
-dbfile <- "data/c003_614.sqldb" # database
-
-NREP <- 300 # replications for the simulation
-
 ################################################################################
-# SEEH
-
-crop <- "SEEH"
-strategy <- "best"
-rfile <- "resultsSEEH" # file for the results in the database
-eff.file <- "data/c001-yld-seeh.eff"
-
 # Oat
 
-crop <- "oat"
-strategy <- "best"
-rfile <- "resultsoat" # file for the results in the database
 eff.file <- "data/c001-yld-oat.eff"
 
 st.read.marker.data ("oat.mpo",format="m",data.set="PP") 
@@ -63,16 +49,8 @@ population.sort("PA", decreasing=TRUE)
 population.divide("Psel", "PA", 144)
 
 ###########################################
-# Loop for the simulation
+# simulation
 ###########################################
-
-e    <- NULL
-
-st.set.info.level(-2)
-
-for (REP in 1:NREP) {
-
-cat (sprintf("%05i\r",REP))
 
 # Cross selected parental lines                        # CR-IL: best
 
@@ -234,14 +212,4 @@ for (i in 1:length(eval))
 }
 m <- tapply(d$y,d$gen,mean);
 e <- merge(data.frame(gen=names(m),y=m),v)
-rownames(e) <- c()
-e$Strategy <- strategy
-e$Crop <- crop
-e$Date <- date()
-
-# Save simulation results in data base
-conn <- dbConnect(RSQLite::SQLite(), dbfile)
-dbWriteTable(conn, rfile, e, append=TRUE)
-dbDisconnect(conn)
-
-} # for (REP in 1:NREP)
+e
