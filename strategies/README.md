@@ -1,6 +1,6 @@
-File c003-050_function_EXGRO.R contains a function for strategy EXGRO.
-Files starting with c003-5 belong to the wheat dataset while those starting with c003-6 belong to the oat dataset.
-Files ending with 00.R calculate marker effects for the respective dataset
+File functions.R contains all additional functions required for the simulated selection strategies.  
+Files starting with c003-5 belong to the wheat dataset while those starting with c003-6 belong to the oat dataset.  
+Files ending with 00.R calculate marker effects for the respective dataset  
 
 The remaining files contain the R-code for the following strategies:  
 ~10.R strategy “GEGV-RND”  
