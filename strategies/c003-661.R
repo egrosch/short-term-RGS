@@ -3,65 +3,7 @@
 # Strategy UC-SM
 ################################################################################
 
-#function
-SimpleMatingHet <-function(Generation,alpha,NumCross,cullpairK,typk)
-{
-  
-  #calculate relationship matrix G for K
-  
-  remove.population("testpop")
-  population.copy("testpop",Generation)
-  st.get.simpop("testpop","testpop")
-  st.read.map(map,skip=1, format="mcp",data.set="testpop")
-  genotype.population("testpop")                
-  evaluate.population("testpop", "yld")
-  
-  # can only calculate ZZ for markers with at leest two alleles
-  xx <- st.marker.data.statistics("testpop")
-  if(length(which(xx$marker.list$NoAll<2))!=0){st.restrict.marker.data(data.set="testpop", ExHet.MIN = 0.0001) # entfernt alle Marker, bei denen es nur ein Allel gibt
-  }
-  ZZ <- gs.build.Z(data.set="testpop", out.filename="Z.matrix", auxfiles=T)
-  AA <- as.matrix(ZZ)
-  GG <- Gmatrix(SNPmatrix=AA, 
-                maf=0.05, method="VanRaden")
-  
-  #need the original names for the G matrix
-  ttt <- st.marker.data.statistics(Generation)
-  colnames(GG) <- ttt$individual.list$Name
-  row.names(GG) <- ttt$individual.list$Name
-  relMat <- GG
-  
-  #calculate UC with SelectionTools #Alpha can now be 0
-  gs.cross.eval.ma(data.set=Generation)
-  gs.cross.eval.mu(data.set=Generation)
-  gs.cross.eval.va(pop.type=typk, data.set=Generation)
-  gs.cross.eval.es(alpha=alpha, data.set=Generation)
-  crs.Psel  <- gs.cross.info(data.set=Generation,sortby ="ma")
-  
-  #combine Parents, criteria and relativeness
-  for (u in 1:length(crs.Psel[,1])) {
-    crs.Psel$K[u] <- relMat[which(colnames(relMat)==crs.Psel$P1Name[u]),which(colnames(relMat)==crs.Psel$P2Name[u])]
-  }
-  KrzAuswahl <- crs.Psel[,c(3,4,10,11)]
-  colnames(KrzAuswahl) <- c("Parent1", "Parent2", "Y", "K")
-  
-  ## Running the optimization
-  maxGain = selectCrosses(data = KrzAuswahl,
-                          n.cross = NumCross,  #Number of Crosses
-                          max.cross = 1,
-                          min.cross = 0,
-                          #K= relMat, #KrzAuswahl[,4],#relMat
-                          culling.pairwise.k = cullpairK)  
-  
-  #save results in a data.frame
-  cross <- data.frame(elter1<- rep(0, times=NumCross),elter2<- rep(0, times=NumCross))
-  colnames(cross) <-c("Elter1","Elter2")
-  for (v in 1:NumCross) {
-    cross$Elter1[v] <- as.numeric(unlist(strsplit(maxGain[[2]]$Parent1[v], split='.', fixed=TRUE))[2])
-    cross$Elter2[v] <- as.numeric(unlist(strsplit(maxGain[[2]]$Parent2[v], split='.', fixed=TRUE))[2])
-  }
-  return(cross)
-}
+source("functions.R")
 
 library("SimpleMating")
 library ("SelectionTools")

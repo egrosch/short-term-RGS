@@ -3,8 +3,7 @@
 # Strategy EXGRO
 ################################################################################
 
-#read in function 
-source("c003-050_function_ExGrO.R")
+source("functions.R")
 
 library ("SelectionTools")
 library("sqldf")

@@ -3,27 +3,7 @@
 # Strategy EMGV-RND
 ################################################################################
 
-calc.embv <- function(pop,N,G,REP){
-    l <- list.populations()
-    n <- l[ pop == l[,1],2]
-    embv <- rep(0,n)
-    gv   <- rep(0,REP)
-    population.copy("EMBVsplit",pop)
-    for (ii in 1:n) {
-        population.divide ("EMBVSC","EMBVsplit",1)
-        for (r in 1:REP) { 
-            dh ("EMBVDH","EMBVSC",G)
-            genotype.population("EMBVDH")
-            evaluate.population("EMBVDH", "yld")
-            population.sort("EMBVDH", decreasing=TRUE) 
-            population.divide("EMBVDHsel", "EMBVDH", N)
-            gval <-get.population.gvalue("EMBVDHsel")
-            gv[r] <- mean(gval$gvalue)
-        }
-        embv[ii] <- mean(gv)
-    }
-    return(embv)
-}
+source("functions.R")
 
 library ("SelectionTools")
 library("sqldf")
