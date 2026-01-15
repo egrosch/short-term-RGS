@@ -3,39 +3,7 @@
 # Strategy GDI-TOP
 ################################################################################
 
-sel.crs <- function (d.sorted,ncp,nct,old.crs=NULL)
-                                        # ncp Number of crosses per parent  
-                                        # nct Total number of crosses       
-    {
-        indx <- rep(FALSE,nrow(d.sorted))           
-
-        if (!is.null(old.crs))
-          for (i in 1:nrow(old.crs))
-            for (j in 1:nrow(d.sorted))
-              if ((old.crs[i,1]==d.sorted[j,1])&&(old.crs[i,2]==d.sorted[j,2]))
-                indx[j] <- TRUE
-        
-        new.crs <- 0
-        for (i in 1:nrow(d.sorted))  {
-            crosses.so.far <- c(d.sorted$OTU1[indx],d.sorted$OTU2[indx])
-
-            search1 <- paste("\\b",d.sorted$OTU1[i],"\\b",sep="")
-            search2 <- paste("\\b",d.sorted$OTU2[i],"\\b",sep="")
-            
-            if ( (new.crs<nct)                               &&
-                (ncp > length(grep(search1,crosses.so.far))) &&
-                (ncp > length(grep(search2,crosses.so.far))) &&
-                (FALSE == indx[i])                                 )
-                {
-                    indx[i] <- TRUE
-                    new.crs = 1 + new.crs
-                }
-        }
-        crosses <- d.sorted[indx,]
-
-        return (crosses)
-    }
-
+source("functions.R")
 
 library ("SelectionTools")
 library("sqldf")

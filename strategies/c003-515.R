@@ -3,73 +3,7 @@
 # Strategy MAXG-TOP
 ################################################################################
 
-sel.crs <- function (d.sorted,ncp,nct,old.crs=NULL)
-                                        # ncp Number of crosses per parent  
-                                        # nct Total number of crosses       
-    {
-        indx <- rep(FALSE,nrow(d.sorted))           
-
-        if (!is.null(old.crs))
-          for (i in 1:nrow(old.crs))
-            for (j in 1:nrow(d.sorted))
-              if ((old.crs[i,1]==d.sorted[j,1])&&(old.crs[i,2]==d.sorted[j,2]))
-                indx[j] <- TRUE
-        
-        new.crs <- 0
-        for (i in 1:nrow(d.sorted))  {
-            crosses.so.far <- c(d.sorted$OTU1[indx],d.sorted$OTU2[indx])
-
-            search1 <- paste("\\b",d.sorted$OTU1[i],"\\b",sep="")
-            search2 <- paste("\\b",d.sorted$OTU2[i],"\\b",sep="")
-            
-            if ( (new.crs<nct)                               &&
-                (ncp > length(grep(search1,crosses.so.far))) &&
-                (ncp > length(grep(search2,crosses.so.far))) &&
-                (FALSE == indx[i])                                 )
-                {
-                    indx[i] <- TRUE
-                    new.crs = 1 + new.crs
-                }
-        }
-        crosses <- d.sorted[indx,]
-
-        return (crosses)
-}
-
-sel.set <- function (ncp, nct, crs.list, crs.old=NULL) {
-  # ncp Number of crosses per parent  
-  # nct Total number of crosses 
-  # crs.list list with all the crosses created in the previous step
-  # (e.g. crs.Psel)
-  # NRUN number of different sets of crosses that are evaluated
-  
-  for(RUN in 1:NRUN) {
-  
-    d.sorted <- data.frame(OTU1     =crs.list$P1No,
-                           OTU2     =crs.list$P2No,
-                           Measure  =crs.list$ma,stringsAsFactors=FALSE)
-    
-    # cross selection:
-    crs     <- sel.crs (d.sorted,ncp=ncp,nct=nct)
-    
-    # Use the first set of crosses as the first reference:
-    if (RUN == 1) {
-      crs.old <- crs
-    }
-    
-    # Is the new set of crosses better than the old set?
-    measure.new <- sum(crs$Measure)/nct
-    measure.old <- sum(crs.old$Measure)/nct
-    if (measure.new > measure.old) {
-      crs.old <- crs
-    }
-    crs.list <- crs.list[-1,]
-    
-  }
-  
-  return(crs.old)
-  
-}
+source("functions.R")
 
 library ("SelectionTools")
 library("sqldf")
