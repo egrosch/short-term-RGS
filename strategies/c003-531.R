@@ -125,7 +125,7 @@ C <- 2; {
         
     d.sorted <- data.frame(OTU1     =crs.Psel$P1No,
                            OTU2     =crs.Psel$P2No,
-                           Measure  =crs.Psel$ma,stringsAsFactors=FALSE)
+                           Measure  =crs.Psel$bpv,stringsAsFactors=FALSE)
     crs     <- sel.crs (d.sorted,ncp=1,nct=36) 
     
     population.copy("tmp","SYN")
@@ -162,7 +162,7 @@ C <- 3; {
     
     d.sorted <- data.frame(OTU1     =crs.Psel$P1No,
                            OTU2     =crs.Psel$P2No,
-                           Measure  =crs.Psel$ma,stringsAsFactors=FALSE)
+                           Measure  =crs.Psel$bpv,stringsAsFactors=FALSE)
     crs     <- sel.crs (d.sorted,ncp=1,nct=36) 
     
     population.copy("tmp","SYN")
